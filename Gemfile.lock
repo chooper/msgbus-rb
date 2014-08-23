@@ -1,0 +1,12 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    redis (3.1.0)
+    retries (0.0.5)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  redis
+  retries

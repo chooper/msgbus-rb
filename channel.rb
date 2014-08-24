@@ -4,9 +4,8 @@ require 'redis'
 require 'retries'
 
 class Channel
-  def initialize(redis_url, key, param={})
+  def initialize(redis_url, param={})
     @url = redis_url
-    @key = key
     @timeout = param[:timeout] || 10 # seconds
   end
 
@@ -18,12 +17,12 @@ class Channel
     end
   end
 
-  def pop
+  def pop(key)
     loop do
       item = nil
       with_retries(:max_tries => 3) do
         self.connect
-        item = @redis.blpop(@key, @timeout)
+        item = @redis.blpop(key, @timeout)
       end
       return item unless item.nil?
     end

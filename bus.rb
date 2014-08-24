@@ -37,11 +37,11 @@ class Bus
   def start_listeners
     @handlers.each do |message_type, blk|
       @urls.each do |url|
-        c = Channel.new(url, message_type.to_s)
+        c = Channel.new(url)
         @channels << c
         Thread.new {
           loop do
-            item = c.pop
+            item = c.pop(message_type.to_s)
             puts "bus -> in-queue: #{item}"
             @in_queue << item
           end
@@ -62,7 +62,7 @@ class Bus
   def start_handlers
     Thread.new {
       loop do
-        type, message = @in_queue.pop
+        type, message = self.pop
         puts "Finding handler for #{type}: #{message}"
         @handlers[type.to_sym].each do |blk|
           puts "Handler found: #{blk}"

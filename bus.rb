@@ -18,8 +18,7 @@ class Bus
   def initialize(redis_urls, chan_params={})
     @urls = redis_urls
 
-    @channels = []
-    #@urls.map { |u| @channels << Channel.new(u, key, chan_params) }
+    @in_channels = []
     @in_queue = Queue.new
 
     @handlers = Hash.new { [] }
@@ -38,7 +37,7 @@ class Bus
     @handlers.each do |message_type, blk|
       @urls.each do |url|
         c = Channel.new(url)
-        @channels << c
+        @in_channels << c
         Thread.new {
           loop do
             item = c.pop(message_type.to_s)

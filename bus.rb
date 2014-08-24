@@ -1,12 +1,6 @@
 #!/usr/bin/env ruby
 
-# spike: listen and publish messages across multiple channels, specifically for
-# fault tolerance.
-#
-# ordering is not guaranteed.
-#
-# assumption #1: we know what channels exist ahead of time
-# assumption #2: we'll just use redis lists for our channels
+# listen and publish messages across multiple redis instances
 
 require 'thread'
 require 'retries'

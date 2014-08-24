@@ -2,6 +2,7 @@
 
 require 'redis'
 require 'retries'
+require 'message'
 
 class Channel
 
@@ -28,18 +29,18 @@ class Channel
       with_retries(:max_tries => 3) do
         self.connect
         # http://redis.io/commands/blpop
-        item = @redis.blpop(key, @timeout)
+        queue, item = @redis.blpop(key, @timeout)
+        return Message.from_json(item) unless item.nil?
       end
-      return item unless item.nil?
     end
   end
 
-  def push(key, message)
+  def push(message)
     # pushes an item onto the tail of a list with the given key
     with_retries(:max_tries => 3) do
       self.connect
       # http://redis.io/commands/rpush
-      @redis.rpush(key, message)
+      @redis.rpush(message.queue, message.serialize)
     end
   end
 end

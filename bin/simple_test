@@ -3,13 +3,22 @@
 $:.unshift File.expand_path(File.join(File.dirname(__FILE__), ".."))
 
 require 'bus'
+require 'message'
 
 def test_handler(msg)
   puts "I'm a message handler: #{msg}"
 end
 
+m1 = Message.new(:testchan, {"hello" => "world"})
+puts m1
+
+m2 = Message.from_json(m1.serialize)
+puts m2
+
+puts "Equal? #{m1 == m2}"
+
 b = Bus.new(ENV['REDIS_URLS'].split(','))
 b.add_handler(:testchan) { |m| test_handler(m) }
 b.setup
-b.push(:testchan, "hihihi! #{rand}")
+b.push(m1)
 b.join

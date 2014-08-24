@@ -36,9 +36,9 @@ class Bus
     @in_queue.pop
   end
 
-  def push(message_type, message)
+  def push(message)
     # push a message into the local out-queue (hence on to the redis bus)
-    @out_queue.push([message_type.to_s, message])
+    @out_queue.push(message)
   end
 
   def setup
@@ -57,9 +57,10 @@ class Bus
       @out_channels << c
       Thread.new {
         loop do
-          message_type, message = @out_queue.pop
+          message = @out_queue.pop
+          message_type = message.queue
           puts "out-queue -> bus: #{[message_type.to_s, message]}"
-          c.push(message_type, message)
+          c.push(message)
         end
       }
     end
@@ -102,7 +103,8 @@ class Bus
     # itself
     Thread.new {
       loop do
-        type, message = self.pop
+        message = self.pop
+        type = message.queue
         puts "Finding handler for #{type}: #{message}"
         @handlers[type.to_sym].each do |blk|
           puts "Handler found: #{blk}"

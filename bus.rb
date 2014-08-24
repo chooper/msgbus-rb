@@ -21,6 +21,9 @@ class Bus
     @in_channels = []
     @in_queue = Queue.new
 
+    @out_channels = []
+    @out_queue = Queue.new
+
     @handlers = Hash.new { [] }
   end
 
@@ -28,9 +31,28 @@ class Bus
     @in_queue.pop
   end
 
+  def push(message_type, message)
+    @out_queue.push([message_type.to_s, message])
+  end
+
   def setup
+    self.start_publishers
     self.start_listeners
     self.start_handlers
+  end
+
+  def start_publishers
+    @urls.each do |url|
+      c = Channel.new(url)
+      @out_channels << c
+      Thread.new {
+        loop do
+          message_type, message = @out_queue.pop
+          puts "out-queue -> bus: #{[message_type.to_s, message]}"
+          c.push(message_type, message)
+        end
+      }
+    end
   end
 
   def start_listeners

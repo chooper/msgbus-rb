@@ -11,4 +11,5 @@ end
 b = Bus.new(ENV['REDIS_URLS'].split(','))
 b.add_handler(:testchan) { |m| test_handler(m) }
 b.setup
+b.push(:testchan, "hihihi! #{rand}")
 b.join

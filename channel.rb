@@ -27,5 +27,12 @@ class Channel
       return item unless item.nil?
     end
   end
+
+  def push(key, message)
+    with_retries(:max_tries => 3) do
+      self.connect
+      @redis.rpush(key, message)
+    end
+  end
 end
 

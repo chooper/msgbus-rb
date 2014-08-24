@@ -73,16 +73,3 @@ class Bus
   end
 end
 
-#
-# ------------------- #
-#
-
-def test_handler(msg)
-  puts "I'm a message handler: #{msg}"
-end
-
-b = Bus.new(ENV['REDIS_URLS'].split(','))
-b.add_handler(:testchan) { |m| test_handler(m) }
-b.setup
-b.join
-
